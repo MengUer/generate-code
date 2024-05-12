@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- 环境配置 -->
+	<environments default="development">
+		<!-- 环境变量 -->
+		<environment id="development">
+			<!-- 事务管理器 -->
+			<transactionManager type="JDBC" />
+			<!-- 数据源 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="oracle.jdbc.OracleDriver" />
+				<property name="url" value="jdbc:oracle:thin:@220.162.247.161:1521:orcl" />
+				<property name="username" value="W_ZDZ_P" />
+				<property name="password" value="f2t42H_3b2_2" />
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource="priv/menguer/velocity/dao/AllTabColumnsMapper.xml" />
+	</mappers>
+
+</configuration>

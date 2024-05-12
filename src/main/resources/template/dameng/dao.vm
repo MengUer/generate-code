@@ -1,0 +1,14 @@
+package ${projectName}.dao;
+
+import ${projectName}.base.BaseMapper;
+import ${projectName}.entity.${className};
+
+/**
+ * @author menguer@126.com
+ * @date 2019年11月25日 下午8:25:23
+ * @version 1.0.0
+ * @description
+ */
+public interface ${className}Mapper extends BaseMapper<${className}> {
+
+}

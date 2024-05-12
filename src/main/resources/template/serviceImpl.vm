@@ -1,0 +1,119 @@
+package com.${projectName}.service.impl;
+
+import java.util.List;
+
+import com.hopetop.port.common.tool.IdGenerator;
+import com.${projectName}.dao.${className}Mapper;
+import com.${projectName}.model.${className};
+import com.${projectName}.service.${className}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+/**
+ * @author menguer@126.com
+ * @date 2019年9月20日 下午1:57:15
+ * @version 1.0.0
+ * @description
+ */
+@Service
+public class ${className}ServiceImpl implements ${className}Service {
+
+	@Autowired
+	private ${className}Mapper mapper;
+
+	@Override
+	public int insert(${className} entity) throws Exception {
+		if (entity.getGid() == null) {
+			entity.setGid(IdGenerator.getId());
+		}
+		return mapper.insert(entity);
+	}
+
+	@Override
+	public int insertMany(List<${className}> list) throws Exception {
+		if (list == null || list.isEmpty()) {
+			return 0;
+		}
+		for (int i = 0; i < list.size(); i++) {
+			${className} entity = list.get(i);
+			if (entity.getGid() == null) {
+				entity.setGid(IdGenerator.getId());
+			}
+		}
+		return mapper.insertMany(list);
+	}
+
+	@Override
+	public int deleteByGid(Long gid) throws Exception {
+		return mapper.deleteByGid(gid);
+	}
+
+	@Override
+	public int deleteByGids(List<Long> gids) throws Exception {
+		if (gids.isEmpty()) {
+			return 0;
+		}
+		if (gids.size() > 1000) {
+			throw new Exception("gid more than 1000");
+		}
+		return mapper.deleteByGids(gids);
+	}
+
+	@Override
+	public int update(${className} entity) throws Exception {
+		return mapper.update(entity);
+	}
+
+	@Override
+	public int updateMany(List<${className}> list) throws Exception {
+		if (list == null || list.isEmpty()) {
+			return 0;
+		}
+		return mapper.updateMany(list);
+	}
+
+	@Override
+	public List<${className}> queryAll() throws Exception {
+		return mapper.queryAll();
+	}
+
+	@Override
+	public List<${className}> queryByEntity(${className} entity) throws Exception {
+		List<${className}> list = mapper.queryByEntity(entity);
+		return list;
+	}
+
+	@Override
+	public ${className} queryByGid(Long gid) throws Exception {
+		${className} entity = mapper.queryByGid(gid);
+		return entity;
+	}
+
+	@Override
+	public List<${className}> queryByGids(List<Long> gids) throws Exception {
+		if (gids.size() > 1000) {
+			throw new Exception("gid more than 1000");
+		}
+		List<${className}> list = mapper.queryByGids(gids);
+		return list;
+	}
+
+	@Override
+	public PageInfo<${className}> queryByPage(Integer page, Integer pageSize, ${className} entity) throws Exception {
+		if (page == null || page < 1) {
+			page = 1;
+		}
+		if (pageSize == null || pageSize < 1) {
+			pageSize = 20;
+		}
+		PageHelper.startPage(page, pageSize);
+		PageHelper.orderBy(entity.getOrderBy() + " " + entity.getOrder());
+
+		List<${className}> list = mapper.queryByEntity(entity);
+		return new PageInfo<>(list);
+	}
+
+}

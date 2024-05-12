@@ -1,0 +1,16 @@
+package com.${projectName}.dao;
+
+import com.hopetop.port.common.base.BasicMapper;
+import com.${projectName}.model.${className};
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * @author menguer@126.com
+ * @date 2019年11月25日 下午8:25:23
+ * @version 1.0.0
+ * @description
+ */
+@Mapper
+public interface ${className}Mapper extends BasicMapper<${className}> {
+
+}

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="priv.menguer.velocity.dao.AllTabColumnsMapper">
+	<resultMap id="BaseResultMap" type="priv.menguer.velocity.entity.AllTabColumns">
+		<result property="owner" column="OWNER" jdbcType="VARCHAR" />
+		<result property="tableName" column="TABLE_NAME" jdbcType="VARCHAR" />
+		<result property="columnName" column="COLUMN_NAME" jdbcType="VARCHAR" />
+		<result property="dataType" column="DATA_TYPE" jdbcType="VARCHAR" />
+		<result property="dataTypeMod" column="DATA_TYPE_MOD" jdbcType="VARCHAR" />
+		<result property="dataTypeOwner" column="DATA_TYPE_OWNER" jdbcType="VARCHAR" />
+		<result property="dataLength" column="DATA_LENGTH" jdbcType="NUMERIC" />
+		<result property="dataPrecision" column="DATA_PRECISION" jdbcType="NUMERIC" />
+		<result property="dataScale" column="DATA_SCALE" jdbcType="NUMERIC" />
+		<result property="nullable" column="NULLABLE" jdbcType="VARCHAR" />
+		<result property="columnId" column="COLUMN_ID" jdbcType="NUMERIC" />
+		<result property="defaultLength" column="DEFAULT_LENGTH" jdbcType="NUMERIC" />
+		<result property="dataDefault" column="DATA_DEFAULT" jdbcType="NUMERIC" />
+		<result property="numDistinct" column="NUM_DISTINCT" jdbcType="NUMERIC" />
+		<result property="lowValue" column="LOW_VALUE" jdbcType="VARCHAR" />
+		<result property="highValue" column="HIGH_VALUE" jdbcType="VARCHAR" />
+		<result property="density" column="DENSITY" jdbcType="NUMERIC" />
+		<result property="numNulls" column="NUM_NULLS" jdbcType="NUMERIC" />
+		<result property="numBuckets" column="NUM_BUCKETS" jdbcType="NUMERIC" />
+		<result property="lastAnalyzed" column="LAST_ANALYZED" jdbcType="TIMESTAMP" />
+		<result property="sampleSize" column="SAMPLE_SIZE" jdbcType="NUMERIC" />
+		<result property="characterSetName" column="CHARACTER_SET_NAME" jdbcType="VARCHAR" />
+		<result property="charColDeclLength" column="CHAR_COL_DECL_LENGTH" jdbcType="NUMERIC" />
+		<result property="globalStats" column="GLOBAL_STATS" jdbcType="VARCHAR" />
+		<result property="userStats" column="USER_STATS" jdbcType="VARCHAR" />
+		<result property="avgColLen" column="AVG_COL_LEN" jdbcType="NUMERIC" />
+		<result property="charLength" column="CHAR_LENGTH" jdbcType="NUMERIC" />
+		<result property="charUsed" column="CHAR_USED" jdbcType="VARCHAR" />
+		<result property="v80FmtImage" column="V80_FMT_IMAGE" jdbcType="VARCHAR" />
+		<result property="dataUpgraded" column="DATA_UPGRADED" jdbcType="VARCHAR" />
+		<result property="histogram" column="HISTOGRAM" jdbcType="VARCHAR" />
+		<result property="defaultOnNull" column="DEFAULT_ON_NULL" jdbcType="VARCHAR" />
+		<result property="identityColumn" column="IDENTITY_COLUMN" jdbcType="VARCHAR" />
+		<result property="evaluationEdition" column="EVALUATION_EDITION" jdbcType="VARCHAR" />
+		<result property="unusableBefore" column="UNUSABLE_BEFORE" jdbcType="VARCHAR" />
+		<result property="unusableBeginning" column="UNUSABLE_BEGINNING" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="TableName">
+		ALL_TAB_COLUMNS
+	</sql>
+
+	<sql id="BaseColumnList">
+		<trim suffixOverrides=",">
+			OWNER,
+			TABLE_NAME,
+			COLUMN_NAME,
+			DATA_TYPE,
+			DATA_TYPE_MOD,
+			DATA_TYPE_OWNER,
+			DATA_LENGTH,
+			DATA_PRECISION,
+			DATA_SCALE,
+			NULLABLE,
+			COLUMN_ID,
+			DEFAULT_LENGTH,
+			DATA_DEFAULT,
+			NUM_DISTINCT,
+			LOW_VALUE,
+			HIGH_VALUE,
+			DENSITY,
+			NUM_NULLS,
+			NUM_BUCKETS,
+			LAST_ANALYZED,
+			SAMPLE_SIZE,
+			CHARACTER_SET_NAME,
+			CHAR_COL_DECL_LENGTH,
+			GLOBAL_STATS,
+			USER_STATS,
+			AVG_COL_LEN,
+			CHAR_LENGTH,
+			CHAR_USED,
+			V80_FMT_IMAGE,
+			DATA_UPGRADED,
+			HISTOGRAM,
+			DEFAULT_ON_NULL,
+			IDENTITY_COLUMN,
+			EVALUATION_EDITION,
+			UNUSABLE_BEFORE,
+			UNUSABLE_BEGINNING,
+		</trim>
+	</sql>
+
+	<select id="queryAll" resultMap="BaseResultMap">
+		SELECT
+		<include refid="BaseColumnList" />
+		FROM
+		<include refid="TableName" />
+		t
+	</select>
+
+	<select id="queryByParam" resultMap="BaseResultMap">
+		SELECT
+		<include refid="BaseColumnList" />
+		FROM
+		<include refid="TableName" />
+		t
+		<where>
+			AND t.OWNER = #{owner}
+			<if test="tableNames != null and tableNames.size() > 0">
+				AND t.TABLE_NAME in
+				<foreach item="item" index="index" collection="tableNames" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+</mapper>

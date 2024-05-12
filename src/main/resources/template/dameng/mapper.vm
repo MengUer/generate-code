@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${projectName}.dao.${className}Mapper">
+    <resultMap id="baseResultMap" type="${projectName}.entity.${className}">
+    #foreach($e in $list)
+        <result property="${e.columnJavaName}" column="${e.columnName}" />
+    #end    
+    </resultMap>
+    
+    <sql id="tableName">
+        ${owner}.${tableName}
+    </sql>
+    
+    <sql id="baseColumns">
+        <trim suffixOverrides=",">
+        #foreach($e in $list)
+            ${e.columnName},
+        #end    
+        </trim>
+    </sql>
+    
+    <insert id="insert" parameterType="${projectName}.entity.${className}">
+        INSERT INTO
+        <include refid="tableName" />
+        (
+        <trim suffixOverrides=",">
+        #foreach($e in $list)
+            #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+            <if test="${e.columnJavaName} != null ">${e.columnName},</if>
+            #end
+        #end    
+        </trim>
+        )VALUES(
+        <trim suffixOverrides=",">
+        #foreach($e in $list)
+            #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+            <if test="${e.columnJavaName} != null ">#{${e.columnJavaName}},</if>
+            #end
+        #end    
+        </trim>
+        )
+    </insert>
+    
+    <insert id="insertMany" parameterType="java.util.List">
+        INSERT ALL
+        <foreach item="item" index="index" collection="list">
+            INTO
+            <include refid="tableName" />
+            (
+            <trim suffixOverrides=",">
+            #foreach($e in $list)
+                #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+                <if test="item.${e.columnJavaName} != null ">${e.columnName},</if>
+                #end
+            #end    
+            </trim>
+            )VALUES(
+            <trim suffixOverrides=",">
+            #foreach($e in $list)
+                #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+                <if test="item.${e.columnJavaName} != null ">#{item.${e.columnJavaName}},</if>
+                #end
+            #end    
+            </trim>
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE 1=1
+    #foreach( $e in $list)
+        #if(${e.columnIsPrimaryKey} =='1')
+        AND ${e.columnName} = #{${e.columnJavaName}}
+        #end
+    #end
+    </delete>
+
+    <delete id="deleteByIds" parameterType="java.util.List">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE 1=1 
+    #foreach( $e in $list)
+        #if(${e.columnIsPrimaryKey} =='1')
+        AND ${e.columnName} IN
+        #end
+    #end
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    
+    <delete id="delete" parameterType="${projectName}.entity.${className}">
+        DELETE FROM
+        <include refid="tableName" />
+        WHERE 1=1
+#foreach( $e in $list)
+    #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+        #if(${e.myBatisType}=='VARCHAR' && ${e.columnIsLikeQuery}=='YES')
+        <if test="${e.columnJavaName} != null">AND ${e.columnName} LIKE CONCAT(CONCAT('%',#{${e.columnJavaName}}),'%')</if>
+        #elseif(${e.myBatisType}!='TIMESTAMP')
+        <if test="${e.columnJavaName} != null">AND ${e.columnName} = #{${e.columnJavaName}}</if>
+        #end
+    #end
+#end
+    </delete>
+
+    <update id="update" parameterType="${projectName}.entity.${className}">
+        UPDATE
+        <include refid="tableName" />
+        <set>
+        #foreach( $e in $list)
+            #if(${e.columnIsPrimaryKey} !='1' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+            <if test="${e.columnJavaName} != null">${e.columnName} = #{${e.columnJavaName}},</if>
+            #end
+        #end
+        update_time = sysdate
+        </set>
+        WHERE 1=1 
+    #foreach( $e in $list)
+        #if(${e.columnIsPrimaryKey} =='1')
+        AND ${e.columnName} = #{${e.columnJavaName}}
+        #end
+    #end
+    </update>
+
+    <update id="updateMany" parameterType="java.util.List">
+        BEGIN
+        <foreach item="item" index="index" collection="list">
+            UPDATE
+            <include refid="tableName" />
+            <set>
+            #foreach( $e in $list)
+                #if(${e.columnIsPrimaryKey} !='1' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+                <if test="item.${e.columnJavaName} != null">${e.columnName} = #{item.${e.columnJavaName}},</if>
+                #end
+            #end
+            update_time = sysdate
+            </set>
+            WHERE 1=1 
+        #foreach( $e in $list)
+            #if(${e.columnIsPrimaryKey} =='1')
+            AND ${e.columnName} = #{item.${e.columnJavaName}}
+            #end
+        #end;
+        </foreach>
+        END;
+    </update>
+    
+    <!-- 有则更新，无则新增 -->
+    <insert id="merge" parameterType="${projectName}.entity.${className}">
+        MERGE into <include refid="tableName" /> t
+        USING (
+            SELECT
+            <trim suffixOverrides=",">
+            #foreach($e in $list)
+            <choose><when test="${e.columnJavaName} != null">#{${e.columnJavaName}}</when><otherwise>''</otherwise></choose> AS ${e.columnName},
+            #end
+            </trim>
+            FROM dual
+        ) tt
+        ON (
+            1=1
+        #foreach($e in $list)
+            #if(${e.columnIsUniqueKey} =='1')
+            and t.${e.columnName} = tt.${e.columnName}
+            #end
+        #end   
+        )
+        WHEN MATCHED THEN
+            <!-- 执行update -->
+            UPDATE
+            <set>
+            #foreach( $e in $list)
+                #if(${e.columnIsPrimaryKey} !='1' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime' && ${e.columnIsUniqueKey}!='1')
+                t.${e.columnName} = tt.${e.columnName},
+                #end
+            #end
+                t.update_time = sysdate
+            </set>
+        WHEN NOT MATCHED THEN
+            <!-- 执行insert -->
+            INSERT 
+            (
+            <trim suffixOverrides=",">
+            #foreach($e in $list)
+                #if(${e.columnIsPrimaryKey} !='1' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+                t.${e.columnName},
+                #end
+            #end    
+            </trim>
+            )VALUES(
+            <trim suffixOverrides=",">
+            #foreach($e in $list)
+                #if(${e.columnIsPrimaryKey} !='1' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+                tt.${e.columnName},
+                #end
+            #end    
+            </trim>
+            )
+    </insert>
+    
+    <select id="list" parameterType="${projectName}.entity.${className}" resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumns" />
+        FROM
+        <include refid="tableName" />
+        WHERE 1=1
+#foreach( $e in $list)
+    #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+        #if(${e.myBatisType}=='VARCHAR' && ${e.columnIsLikeQuery}=='YES')
+        <if test="${e.columnJavaName} != null">
+            AND ${e.columnName} LIKE CONCAT(CONCAT('%',#{${e.columnJavaName}}),'%')
+        </if>
+        #elseif(${e.myBatisType}!='TIMESTAMP')
+        <if test="${e.columnJavaName} != null">AND ${e.columnName} = #{${e.columnJavaName}}</if>
+        #end
+    #end
+#end
+    </select>
+    
+    <select id="getInfo" parameterType="java.lang.Long" resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumns" />
+        FROM
+        <include refid="tableName" />
+        WHERE 1=1 
+    #foreach( $e in $list)
+        #if(${e.columnIsPrimaryKey} =='1')
+        AND ${e.columnName} = #{${e.columnJavaName}}
+        #end
+    #end
+    </select>
+    
+    <select id="getInfoGroupBy" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT
+        #foreach($e in $list)
+            t1.${e.columnName} AS ${e.columnJavaName},
+        #end    
+            t2.count
+        FROM
+            <include refid="tableName" /> t1
+        LEFT JOIN
+            (
+            SELECT 
+                min(seq_id) seq_id,
+                count(*) count
+            FROM <include refid="tableName" />
+            WHERE 1=1
+#foreach( $e in $list)
+    #if(${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
+        #if(${e.myBatisType}=='VARCHAR' && ${e.columnIsLikeQuery}=='YES')
+            <if test="entity.${e.columnJavaName} != null">
+                AND ${e.columnName} LIKE CONCAT(CONCAT('%',#{entity.${e.columnJavaName}}),'%')
+            </if>
+        #elseif(${e.myBatisType}!='TIMESTAMP')
+            <if test="entity.${e.columnJavaName} != null">AND ${e.columnName} = #{entity.${e.columnJavaName}}</if>
+        #end
+    #end
+#end
+            GROUP BY
+            <trim suffixOverrides=",">
+                <foreach item="item" index="index" collection="groupBy">
+                #foreach( $e in $list)
+                    <if test="item == '${e.columnName}'">${e.columnName},</if>
+                #end
+                </foreach>
+            </trim>
+        )t2
+        ON t1.seq_id=t2.seq_id
+        WHERE t2.count IS NOT NULL 
+    </select>
+</mapper>

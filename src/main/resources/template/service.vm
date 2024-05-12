@@ -1,0 +1,14 @@
+package com.${projectName}.service;
+
+import com.hopetop.port.common.base.BasicService;
+import com.${projectName}.model.${className};
+
+/**
+ * @author menguer@126.com
+ * @date 2019年11月25日 下午8:26:38
+ * @version 1.0.0
+ * @description
+ */
+public interface ${className}Service extends BasicService<${className}> {
+
+}

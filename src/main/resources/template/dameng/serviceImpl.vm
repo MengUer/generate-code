@@ -1,0 +1,115 @@
+package ${projectName}.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.alibaba.fastjson.JSONArray;
+import ${projectName}.entity.${className};
+import ${projectName}.dao.${className}Mapper;
+import ${projectName}.service.${className}Service;
+
+/**
+ * @author menguer@126.com
+ * @date 2019年9月20日 下午1:57:15
+ * @version 1.0.0
+ * @description
+ */
+@Service
+public class ${className}ServiceImpl implements ${className}Service {
+
+    @Autowired
+    private ${className}Mapper mapper;
+
+    @Override
+    public int insert(${className} entity) throws Exception {
+        check(entity);
+        return mapper.insert(entity);
+    }
+
+    @Override
+    public int insertMany(List<${className}> list) throws Exception {
+        if (list == null || list.isEmpty()) {
+            throw new Exception("list is null");
+        }
+        return mapper.insertMany(list);
+    }
+
+    @Override
+    public int deleteById(Long seqId) throws Exception {
+        if (seqId == null) {
+            throw new Exception("id is null");
+        }
+        return mapper.deleteById(seqId);
+    }
+
+    @Override
+    public int deleteByIds(List<Long> seqIds) throws Exception {
+        if (seqIds == null) {
+            throw new Exception("ids is null");
+        } else if (seqIds.ize() > 1000) {
+            throw new Exception("id more than 1000");
+        }
+        return mapper.deleteByIds(seqIds);
+    }
+    
+    @Override
+    public int delete(${className} entity) throws Exception {
+        if (entity == null) {
+            throw new Exception("entity is null");
+        }
+        return mapper.delete(entity);
+    }
+
+    @Override
+    public int update(${className} entity) throws Exception {
+        check(entity);
+        if (entity.getSeqId() == null) {
+            throw new Exception("id is null");
+        }
+        return mapper.update(entity);
+    }
+
+    @Override
+    public int updateMany(List<${className}> list) throws Exception {
+        if (list == null || list.isEmpty()) {
+            throw new Exception("list is null");
+        }
+        return mapper.updateMany(list);
+    }
+    
+    @Override
+    public int merge(${className} entity) throws Exception {
+        check(entity);
+        return mapper.merge(entity);
+    }
+
+    @Override
+    public List<${className}> list(${className} entity) throws Exception {
+        return mapper.list(entity);
+    }
+    
+    @Override
+    public ${className} getInfo(Long id) throws Exception {
+        if (id == null) {
+            throw new Exception("id is null");
+        }
+        return mapper.getInfo(id);
+    }
+    
+    @Override
+    public JSONArray getInfoGroupBy(${className} entity, String groupBy) throws Exception {
+        if (groupBy == null || groupBy.isEmpty()) {
+            throw new Exception("groupBy is null");
+        }
+        return mapper.getInfoGroupBy(entity, groupBy.split(","));
+    }
+    
+    private ${className} check(${className} entity) throws Exception {
+        if (entity == null) {
+            throw new Exception("entity is null");
+        }
+        return entity;
+    }
+}
