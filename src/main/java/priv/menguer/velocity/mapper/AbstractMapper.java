@@ -17,7 +17,7 @@ import priv.menguer.velocity.config.GenConfig;
  * @update
  * @remark
  */
-public abstract class AbstracMapper {
+public abstract class AbstractMapper {
 
 	private Connection connect;
 	private Statement statement;

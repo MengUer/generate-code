@@ -49,7 +49,7 @@ public class GenerateCodeServiceImpl {
 	private static final String CHECK = "C";
 	private static VelocityEngine velocityEngine;
 
-	private BaseMapper baseMapper = BaseMapper.getInstance();
+	private final BaseMapper baseMapper = BaseMapper.getInstance();
 
 	public void execute() throws Exception {
 		List<TableInfo> tableInfos = getTableInfos();
@@ -126,12 +126,7 @@ public class GenerateCodeServiceImpl {
 		while (allConsColumns.next()) {
 			String columnName = allConsColumns.getString("COLUMN_NAME");
 			String constraintType = allConsColumns.getString("CONSTRAINT_TYPE");
-			String string = map.get(columnName);
-			if (string == null) {
-				map.put(columnName, constraintType);
-			} else {
-				map.put(columnName, string.concat(constraintType));
-			}
+            map.merge(columnName, constraintType, String::concat);
 		}
 		return map;
 	}
@@ -205,7 +200,7 @@ public class GenerateCodeServiceImpl {
 	 * @time 2019年11月27日 下午1:34:30
 	 * @param subproject
 	 *            子工程名称
-	 * @param templateName
+	 * @param templateType
 	 * @param className
 	 *            类名
 	 * @return

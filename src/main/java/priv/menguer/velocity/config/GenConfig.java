@@ -1,6 +1,7 @@
 package priv.menguer.velocity.config;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -107,11 +108,9 @@ public class GenConfig {
 		schemaName = properties.getProperty("schemaName");
 		tableType = properties.getProperty("tableType");
 		String tns = properties.getProperty("tableNames");
-		if (tns != null && !"".equals(tns)) {
-			tableNames = new HashSet<String>();
-			for (String tableName : tns.split(",")) {
-				tableNames.add(tableName);
-			}
+		if (tns != null && !tns.isEmpty()) {
+			tableNames = new HashSet<>();
+            Collections.addAll(tableNames, tns.split(","));
 		}
 
 		saveFilePath = properties.getProperty("saveFilePath");
