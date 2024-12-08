@@ -105,7 +105,6 @@ public class GenerateCode {
 		String filePath = getGeneratePath(subproject, templateType, className);
 		// 生成文件,如果文件已经存在,会生成新文件覆盖旧文件
 		Writer writer = new PrintWriter(filePath);
-		getTemplateByType(templateType).merge(context, writer);
 		writer.close();
 		System.out.println("生成文件：" + filePath);
 	}
@@ -118,16 +117,6 @@ public class GenerateCode {
 	 * @param templateType
 	 * @return
 	 */
-	private Template getTemplateByType(TemplateEnum templateType) {
-		if (velocityEngine == null) {
-			velocityEngine = new VelocityEngine();
-			Properties properties = new Properties();
-			properties.setProperty("resource.loader", "class");
-			properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-			velocityEngine.init(properties);
-		}
-		return velocityEngine.getTemplate("/template/" + templateType.getValue() + ".vm", "utf-8");
-	}
 
 	/**
 	 * 根据不同模版获取生成文件的文件夹路径
@@ -136,7 +125,7 @@ public class GenerateCode {
 	 * @time 2019年11月27日 下午1:34:30
 	 * @param subproject
 	 *            子工程名称
-	 * @param templateName
+	 * @param templateType
 	 * @param className
 	 *            类名
 	 * @return

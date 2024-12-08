@@ -36,7 +36,7 @@ public interface BasicMapper<T> {
 	 * 
 	 * @author ZhangMingHan
 	 * @time 2023年12月26日 14:35:48
-	 * @param gid
+	 * @param id
 	 * @return
 	 */
 	int deleteById(Long id);
@@ -46,7 +46,7 @@ public interface BasicMapper<T> {
 	 * 
 	 * @author ZhangMingHan
 	 * @time 2023年12月26日 14:35:53
-	 * @param gids
+	 * @param ids
 	 * @return
 	 */
 	int deleteByIds(Long[] ids);
@@ -86,7 +86,7 @@ public interface BasicMapper<T> {
 	 * 
 	 * @author ZhangMingHan
 	 * @time 2024年1月21日 17:37:21
-	 * @param list
+	 * @param entity
 	 * @return
 	 */
 	int merge(T entity);

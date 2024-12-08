@@ -38,7 +38,7 @@ public class TableInfoServiceImpl extends AbstracService {
 
 	public List<TableInfo> geTableInfoList() throws EncryptedDocumentException, IOException {
 		List<TableInfo> tableInfos = new ArrayList<TableInfo>();
-		switch (GenConfig.generateType) {
+		switch (GenConfig.databaseType) {
 		case "1":
 			geTableInfoByDatabase(tableInfos);
 			break;

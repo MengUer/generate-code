@@ -10,6 +10,5 @@ package priv.menguer.velocity.service;
  * @remark
  */
 public interface GenerateCodeService {
-
     void execute() throws Exception;
 }
