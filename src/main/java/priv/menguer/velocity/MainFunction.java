@@ -2,6 +2,7 @@ package priv.menguer.velocity;
 
 import priv.menguer.velocity.config.GenConfig;
 import priv.menguer.velocity.service.impl.GenerateCodeServiceImpl;
+import priv.menguer.velocity.service.impl.MysqlServiceImpl;
 
 /**
  * @package priv.menguer.velocity
@@ -25,7 +26,7 @@ public class MainFunction {
 		GenConfig.init();
 		// FileUtils.createFolder(GenConfig.saveFilePath);
 		try {
-			new GenerateCodeServiceImpl().execute();
+			new MysqlServiceImpl().execute();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

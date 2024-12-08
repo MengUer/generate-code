@@ -1,29 +1,24 @@
 package priv.menguer.velocity.service.impl;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-
 import priv.menguer.commons.core.constant.BaseConstant;
 import priv.menguer.commons.core.util.FileUtils;
 import priv.menguer.commons.core.util.StrUtils;
 import priv.menguer.velocity.config.GenConfig;
 import priv.menguer.velocity.constant.TemplateEnum;
-import priv.menguer.velocity.dao.DaMengMapper;
+import priv.menguer.velocity.dao.MysqlMapper;
 import priv.menguer.velocity.entity.ColumnInfo;
 import priv.menguer.velocity.entity.TableInfo;
 import priv.menguer.velocity.service.GenerateCodeService;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author menguer@126.com
@@ -31,29 +26,20 @@ import priv.menguer.velocity.service.GenerateCodeService;
  * @date 2019年11月8日 下午3:07:49
  * @description
  */
-public class GenerateCodeServiceImpl implements GenerateCodeService {
+public class MysqlServiceImpl {
     /**
      * 主键约束
      */
-    public static final String PRIMARY_KEY = "P";
+    private static final String DB_TYPE = "mysql/";
+    private static final String PRIMARY_KEY = "PRI";
     /**
      * 唯一键约束
      */
-    public static final String UNIQUE = "U";
-    /**
-     * 外键约束
-     */
-    public static final String REFERENTIAL_INTEGRITY = "R";
-    /**
-     * 检查约束
-     */
-    public static final String CHECK = "C";
-
+    private static final String UNIQUE = "U";
     private static VelocityEngine velocityEngine;
 
-    private final DaMengMapper baseMapper = DaMengMapper.getInstance();
+    private final MysqlMapper baseMapper = MysqlMapper.getInstance();
 
-    @Override
     public void execute() throws Exception {
         List<TableInfo> tableInfos = getTableInfos();
         for (TableInfo tableInfo : tableInfos) {
@@ -79,69 +65,53 @@ public class GenerateCodeServiceImpl implements GenerateCodeService {
         System.out.println("执行完毕。");
     }
 
+    /**
+     * 获取表信息
+     *
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2024/12/8 17:14
+     */
     private List<TableInfo> getTableInfos() throws Exception {
         ResultSet resultSet = baseMapper.getAllTabComments(GenConfig.schemaName, GenConfig.tableType, GenConfig.tableNames);
-        // 4. 获取结果集的元数据
-        // ResultSetMetaData metaData = resultSet.getMetaData();
-        // 5. 获取列数（字段数）
-        // int columnCount = metaData.getColumnCount();
         // 6. 遍历结果集中的每一行数据
         List<TableInfo> tableInfos = new ArrayList<>();
         while (resultSet.next()) {
-
-            String owner = resultSet.getString("OWNER");
+            String tableSchema = resultSet.getString("TABLE_SCHEMA");
             String tableName = resultSet.getString("TABLE_NAME");
-            String tableComment = resultSet.getString("COMMENTS");
-            System.out.println(owner + "." + tableName + "\t" + tableComment);
+            String tableComment = resultSet.getString("TABLE_COMMENT");
+            System.out.println(tableSchema + "." + tableName + "\t" + tableComment);
             // 获取该表所有字段
-            ResultSet resultSet01 = baseMapper.getAllColumns(owner, tableName);
-            // 获取该表所有约束字段
-            Map<String, String> allConsColumnsMap = getAllConsColumnsMap(owner, tableName);
+            ResultSet columnResultSet = baseMapper.getAllColumns(tableSchema, tableName);
 
             List<ColumnInfo> columns = new ArrayList<>();
-            while (resultSet01.next()) {
-                String columnName = resultSet01.getString("COLUMN_NAME");
-                String columnType = resultSet01.getString("DATA_TYPE");
-                String columnComment = resultSet01.getString("COMMENTS");
-                String constraintType = allConsColumnsMap.get(columnName);
-                columns.add(new ColumnInfo(columnName, getJavaType(columnType), StrUtils.underlineToCamel(columnName.toLowerCase(), true),
-                        columnComment, constraintType != null && constraintType.contains(PRIMARY_KEY) ? BaseConstant.YES : BaseConstant.NO,
-                        constraintType != null && constraintType.contains(UNIQUE) ? BaseConstant.YES : BaseConstant.NO));
+            while (columnResultSet.next()) {
+                String columnName = columnResultSet.getString("COLUMN_NAME");
+                String columnType = columnResultSet.getString("DATA_TYPE");
+                String columnComment = columnResultSet.getString("COLUMN_COMMENT");
+                String columnKey = columnResultSet.getString("COLUMN_KEY");
+                columns.add(new ColumnInfo(
+                        columnName
+                        , getJavaType(columnType)
+                        , StrUtils.underlineToCamel(columnName.toLowerCase(), true)
+                        , columnComment
+                        , columnKey != null && columnKey.contains(PRIMARY_KEY) ? BaseConstant.YES : BaseConstant.NO
+                        , columnKey != null && columnKey.contains(UNIQUE) ? BaseConstant.YES : BaseConstant.NO));
             }
-            tableInfos.add(new TableInfo(owner, tableName, tableComment, columns));
-
-            // 7. 遍历每一行的每一个字段
-            // for (int i = 1; i <= columnCount; i++) {
-            // // 8. 使用元数据获取字段的名称和值
-            // String columnName = metaData.getColumnName(i);
-            // Object columnValue = resultSet.getObject(i);
-            //
+            tableInfos.add(new TableInfo(tableSchema, tableName, tableComment, columns));
         }
         return tableInfos;
     }
 
-    private Map<String, String> getAllConsColumnsMap(String owner, String tableName) throws SQLException {
-        Map<String, String> map = new HashMap<String, String>();
-        ResultSet allConsColumns = baseMapper.getAllConsColumns(owner, tableName);
-        if (allConsColumns == null) {
-            return map;
-        }
-        while (allConsColumns.next()) {
-            String columnName = allConsColumns.getString("COLUMN_NAME");
-            String constraintType = allConsColumns.getString("CONSTRAINT_TYPE");
-            map.merge(columnName, constraintType, String::concat);
-        }
-        return map;
-    }
-
     private String getJavaType(String columnType) {
-        if (columnType.contains("INT")) {
+        if (columnType.contains("int")) {
             return "Integer";
         }
-        if ("DOUBLE".equals(columnType) || "NUMBER".equals(columnType) || "NUMERIC".equals(columnType)) {
+        if ("double".equals(columnType) || "number".equals(columnType) || "numeric".equals(columnType)) {
             return "BigDecimal";
         }
-        if (columnType.contains("DATE") || columnType.contains("TIME")) {
+        if (columnType.contains("date") || columnType.contains("time")) {
             return "Date";
         }
 
@@ -193,7 +163,7 @@ public class GenerateCodeServiceImpl implements GenerateCodeService {
             properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
             velocityEngine.init(properties);
         }
-        return velocityEngine.getTemplate("/template/" + templateType.getValue() + ".vm", "utf-8");
+        return velocityEngine.getTemplate("/template/" + DB_TYPE + templateType.getValue() + ".vm", "utf-8");
     }
 
     /**
@@ -244,5 +214,4 @@ public class GenerateCodeServiceImpl implements GenerateCodeService {
         }
         return generatePath.append("\\").append(className).append(".txt").toString();
     }
-
 }

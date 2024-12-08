@@ -22,7 +22,7 @@ public interface AllTabColumnsMapper {
 	 * @author menguer@126.com
 	 * @time 2020-8-30 11:08:09
 	 * @param owner
-	 * @param tableName
+	 * @param tableNames
 	 * @return
 	 */
 	List<AllTabColumns> queryByParam(@Param("owner") String owner, @Param("tableNames") Set<String> tableNames);

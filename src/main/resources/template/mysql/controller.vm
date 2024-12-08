@@ -1,0 +1,137 @@
+package com.${projectName}.controller;
+
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
+import com.hopetop.port.common.exception.ErrorException;
+import com.hopetop.port.common.response.BaseResponse;
+import com.hopetop.port.common.response.PageResponse;
+import com.hopetop.port.common.tool.ResultTool;
+import com.${projectName}.model.${className};
+import com.${projectName}.service.${className}Service;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * @author menguer@126.com
+ * @date 2019年9月20日 下午2:55:03
+ * @version 1.0.0
+ * @description
+ */
+@RestController
+@Api(value = "${className}Controller", tags = "${tableComment}")
+@RequestMapping(value = "${className}Controller")
+public class ${className}Controller {
+
+	@Autowired
+	private ${className}Service service;
+
+	@ApiOperation(value = "新增单条数据", notes = "新增单条数据")
+	@ApiImplicitParam(name = "entity", value = "json字符串", required = true, dataType = "String", paramType = "query")
+	@RequestMapping(value = "/insert", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<${className}> insert(String entity) throws Exception {
+		if (service.insert(JSONObject.parseObject(entity, ${className}.class)) > 0) {
+			return ResultTool.successNoData("新增数据成功");
+		} else {
+			throw new ErrorException("新增数据失败");
+		}
+	}
+
+	@ApiOperation(value = "新增多条数据", notes = "新增多条数据")
+	@ApiImplicitParam(name = "entity", value = "json字符串数组", required = true, dataType = "String", paramType = "query")
+	@RequestMapping(value = "/insertMany", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<${className}> insertMany(String entity) throws Exception {
+		if (service.insertMany(JSONObject.parseArray(entity, ${className}.class)) > 0) {
+			return ResultTool.successNoData("新增多条数据成功");
+		} else {
+			throw new ErrorException("新增多条数据失败");
+		}
+	}
+
+	@ApiOperation(value = "根据gid删除", notes = "根据gid删除")
+	@ApiImplicitParam(name = "gid", value = "gid", required = true, dataType = "long", paramType = "query")
+	@RequestMapping(value = "/deleteByGid", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<${className}> deleteByGid(Long gid) throws Exception {
+		if (service.deleteByGid(gid) > 0) {
+			return ResultTool.successNoData("删除成功");
+		} else {
+			throw new ErrorException("删除失败");
+		}
+	}
+
+	@ApiOperation(value = "根据gid批量删除", notes = "根据gid批量删除")
+	@ApiImplicitParam(name = "gids", value = "gid数组", required = true, dataType = "String", paramType = "query")
+	@RequestMapping(value = "/deleteByGids", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<${className}> deleteByGids(String gids) throws Exception {
+		if (service.deleteByGids(JSONObject.parseArray(gids, Long.class)) > 0) {
+			return ResultTool.successNoData("批量删除成功");
+		} else {
+			throw new ErrorException("批量删除失败");
+		}
+	}
+
+	@ApiOperation(value = "更新单条数据", notes = "更新单条数据")
+	@ApiImplicitParam(name = "entity", value = "json字符串", required = true, dataType = "String", paramType = "query")
+	@RequestMapping(value = "/update", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<${className}> update(String entity) throws Exception {
+		if (service.update(JSONObject.parseObject(entity, ${className}.class)) > 0) {
+			return ResultTool.successNoData("更新数据成功");
+		} else {
+			throw new ErrorException("更新数据失败");
+		}
+	}
+
+	@ApiOperation(value = "更新多条数据", notes = "更新多条数据")
+	@ApiImplicitParam(name = "entity", value = "json字符串数组", required = true, dataType = "String", paramType = "query")
+	@RequestMapping(value = "/updateMany", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<${className}> updateMany(String entity) throws Exception {
+		if (service.updateMany(JSONObject.parseArray(entity, ${className}.class)) > 0) {
+			return ResultTool.successNoData("更新多条数据成功");
+		} else {
+			throw new ErrorException("更新多条数据失败");
+		}
+	}
+
+	@ApiOperation(value = "查询全部数据", notes = "查询全部数据")
+	@RequestMapping(value = "/queryAll", method = RequestMethod.GET)
+	public BaseResponse<List<${className}>> queryAll() throws Exception {
+		return ResultTool.success(service.queryAll());
+	}
+
+	@ApiOperation(value = "根据gid查询单条记录", notes = "根据gid查询单条记录")
+	@ApiImplicitParam(name = "gid", value = "gid", required = true, dataType = "long", paramType = "query")
+	@RequestMapping(value = "/queryByGid", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<List<${className}>> queryByGid(Long gid) throws Exception {
+		return ResultTool.success(service.queryByGid(gid));
+	}
+
+	@ApiOperation(value = "根据多个gid查询多条记录", notes = "根据多个gid查询多条记录")
+	@ApiImplicitParam(name = "gid", value = "gid", required = true, dataType = "String", paramType = "query")
+	@RequestMapping(value = "/queryByGids", method = { RequestMethod.GET, RequestMethod.POST })
+	public BaseResponse<List<${className}>> queryByGids(String gids) throws Exception {
+		return ResultTool.success(service.queryByGids(JSONObject.parseArray(gids, Long.class)));
+	}
+
+	@ApiOperation(value = "分页查询", notes = "分页查询")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", value = "当前页码", dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "pageSize", value = "每页显示数量", dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "entity", value = "查询条件", dataType = "String", paramType = "query") })
+	@RequestMapping(value = "/queryByPage", method = RequestMethod.GET)
+	public PageResponse<List<${className}>> queryByPage(@RequestParam(name = "page", defaultValue = "1") Integer page,
+			@RequestParam(name = "pageSize", defaultValue = "50") Integer pageSize,
+			@RequestParam(name = "entity", defaultValue = "{}") String entity) throws Exception {
+		PageInfo<${className}> pageInfo = service.queryByPage(page, pageSize,
+				JSONObject.parseObject(entity, ${className}.class));
+		return ResultTool.success(pageInfo.getList(), pageInfo.getTotal());
+	}
+}

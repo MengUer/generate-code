@@ -1,10 +1,8 @@
 package priv.menguer.velocity.service;
 
-import java.io.IOException;
-
 /**
- * @description
  * @author menguer@126.com
+ * @description
  * @date 2020-8-30 14:30:36
  * @verifier
  * @check
@@ -13,5 +11,5 @@ import java.io.IOException;
  */
 public interface GenerateCodeService {
 
-	void execute() throws IOException;
+    void execute() throws Exception;
 }

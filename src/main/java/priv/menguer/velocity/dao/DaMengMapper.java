@@ -1,4 +1,4 @@
-package priv.menguer.velocity.mapper;
+package priv.menguer.velocity.dao;
 
 import java.sql.ResultSet;
 import java.util.HashSet;
@@ -13,25 +13,25 @@ import java.util.Set;
  * @update
  * @remark
  */
-public class BaseMapper extends AbstractMapper {
-    private BaseMapper() {
+public class DaMengMapper extends AbstractMapper {
+    private DaMengMapper() {
     }
 
     private static enum Singleton {
         INSTANCE;
 
-        private final BaseMapper mapper;
+        private final DaMengMapper mapper;
 
         Singleton() {
-            mapper = new BaseMapper();
+            mapper = new DaMengMapper();
         }
 
-        public BaseMapper getInstance() {
+        public DaMengMapper getInstance() {
             return mapper;
         }
     }
 
-    public static BaseMapper getInstance() {
+    public static DaMengMapper getInstance() {
         return Singleton.INSTANCE.getInstance();
     }
 

@@ -1,12 +1,8 @@
-package priv.menguer.velocity.mapper;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+package priv.menguer.velocity.dao;
 
 import priv.menguer.velocity.config.GenConfig;
+
+import java.sql.*;
 
 /**
  * @description

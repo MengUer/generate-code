@@ -1,0 +1,27 @@
+package com.${projectName}.model;
+
+import java.util.Date;
+
+import com.hopetop.port.common.base.PageRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+/**
+ * ${tableComment}实体
+ *
+ * @author menguer@126.com
+ * @date 2019年11月26日 下午1:36:05
+ * @version 1.0.0
+ * @description
+ */
+public class ${className} extends PageRequest {
+	
+#foreach( $e in $list)
+	#if(${e.columnType} == 'Date')
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private ${e.columnType} ${e.columnJavaName};// ${e.columnComment}
+	#else
+	private ${e.columnType} ${e.columnJavaName};// ${e.columnComment}
+	#end
+#end	
+	
+}

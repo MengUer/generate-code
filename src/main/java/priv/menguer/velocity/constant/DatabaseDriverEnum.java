@@ -1,8 +1,8 @@
 package priv.menguer.velocity.constant;
 
 /**
- * @description
  * @author menguer@126.com
+ * @description
  * @date 2020-8-22 10:01:45
  * @verifier
  * @check
@@ -10,18 +10,22 @@ package priv.menguer.velocity.constant;
  * @remark
  */
 public enum DatabaseDriverEnum {
-	ORACLE("oracle.jdbc.OracleDriver"),
+    ORACLE("oracle.jdbc.OracleDriver"),
 
-	MYSQL("");
+    MYSQL("com.mysql.cj.jdbc.Driver"),
 
-	private final String value;
+    DAMENG("dm.jdbc.driver.DmDriver"),
 
-	DatabaseDriverEnum(String value) {
-		this.value = value;
-	}
+    ;
 
-	public String getValue() {
-		return this.value;
-	}
+    private final String value;
+
+    DatabaseDriverEnum(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return this.value;
+    }
 
 }
