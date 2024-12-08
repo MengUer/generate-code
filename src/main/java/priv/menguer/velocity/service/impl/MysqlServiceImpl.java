@@ -1,11 +1,14 @@
 package priv.menguer.velocity.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import priv.menguer.commons.core.constant.BaseConstant;
 import priv.menguer.commons.core.util.StrUtils;
 import priv.menguer.velocity.config.GenConfig;
 import priv.menguer.velocity.dao.MysqlMapper;
 import priv.menguer.velocity.entity.ColumnInfo;
 import priv.menguer.velocity.entity.TableInfo;
+import priv.menguer.velocity.service.MysqlService;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -17,7 +20,8 @@ import java.util.List;
  * @date 2019年11月8日 下午3:07:49
  * @description
  */
-public class MysqlServiceImpl {
+@Service
+public class MysqlServiceImpl implements MysqlService {
     /**
      * 主键约束
      */
@@ -37,6 +41,7 @@ public class MysqlServiceImpl {
      * @author menguer@126.com
      * @time 2024/12/8 17:14
      */
+    @Override
     public List<TableInfo> getTableInfos() throws Exception {
         ResultSet resultSet = baseMapper.getAllTabComments(GenConfig.schemaName, GenConfig.tableType, GenConfig.tableNames);
         // 6. 遍历结果集中的每一行数据

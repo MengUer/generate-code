@@ -1,5 +1,7 @@
 package priv.menguer.velocity.dao;
 
+import org.springframework.stereotype.Component;
+
 import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +15,7 @@ import java.util.Set;
  * @update
  * @remark
  */
+@Component
 public class MysqlMapper extends AbstractMapper {
     private MysqlMapper() {
     }

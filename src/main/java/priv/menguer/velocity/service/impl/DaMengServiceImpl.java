@@ -1,11 +1,13 @@
 package priv.menguer.velocity.service.impl;
 
+import org.springframework.stereotype.Service;
 import priv.menguer.commons.core.constant.BaseConstant;
 import priv.menguer.commons.core.util.StrUtils;
 import priv.menguer.velocity.config.GenConfig;
 import priv.menguer.velocity.dao.DaMengMapper;
 import priv.menguer.velocity.entity.ColumnInfo;
 import priv.menguer.velocity.entity.TableInfo;
+import priv.menguer.velocity.service.DaMengService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,7 +22,8 @@ import java.util.Map;
  * @date 2019年11月8日 下午3:07:49
  * @description
  */
-public class DaMengServiceImpl {
+@Service
+public class DaMengServiceImpl implements DaMengService {
     /**
      * 主键约束
      */
@@ -40,6 +43,7 @@ public class DaMengServiceImpl {
 
     private final DaMengMapper baseMapper = DaMengMapper.getInstance();
 
+    @Override
     public List<TableInfo> getTableInfos() throws Exception {
         ResultSet resultSet = baseMapper.getAllTabComments(GenConfig.schemaName, GenConfig.tableType, GenConfig.tableNames);
         List<TableInfo> tableInfos = new ArrayList<>();
