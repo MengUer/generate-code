@@ -1,16 +1,14 @@
-package com.${projectName}.service.impl;
+package ${projectName}.service.impl;
 
-import java.util.List;
+import java.util.*;
 
-import com.hopetop.port.common.tool.IdGenerator;
-import com.${projectName}.dao.${className}Mapper;
-import com.${projectName}.model.${className};
-import com.${projectName}.service.${className}Service;
+import com.alibaba.fastjson.JSONArray;
+import org.springframework.transaction.annotation.Transactional;
+import ${projectName}.dao.${className}Mapper;
+import ${projectName}.entity.${className};
+import ${projectName}.service.${className}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 
 /**
  * @author menguer@126.com
@@ -20,100 +18,138 @@ import com.github.pagehelper.PageInfo;
  */
 @Service
 public class ${className}ServiceImpl implements ${className}Service {
+    @Autowired
+    private ${className}Mapper mapper;
 
-	@Autowired
-	private ${className}Mapper mapper;
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int upsert(${className} entity) {
+        if (entity == null) {
+            return -1;
+        }
+        return mapper.upsert(entity);
+    }
 
-	@Override
-	public int insert(${className} entity) throws Exception {
-		if (entity.getGid() == null) {
-			entity.setGid(IdGenerator.getId());
-		}
-		return mapper.insert(entity);
-	}
+    @Override
+    public int insert(${className} entity) {
+        if (entity == null) {
+            return -1;
+        }
+        List<${className}> list = new ArrayList<>();
+        list.add(entity);
+        return insertBatch(list);
+    }
 
-	@Override
-	public int insertMany(List<${className}> list) throws Exception {
-		if (list == null || list.isEmpty()) {
-			return 0;
-		}
-		for (int i = 0; i < list.size(); i++) {
-			${className} entity = list.get(i);
-			if (entity.getGid() == null) {
-				entity.setGid(IdGenerator.getId());
-			}
-		}
-		return mapper.insertMany(list);
-	}
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int insertBatch(List<${className}> list) {
+        if (list == null || list.isEmpty()) {
+            return -1;
+        }
+        int size = list.size();
+        for (int i = 0; i < size; i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, size);
+            mapper.insertBatch(list.subList(i, end));
+        }
+        return size;
+    }
 
-	@Override
-	public int deleteByGid(Long gid) throws Exception {
-		return mapper.deleteByGid(gid);
-	}
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(${className} entity) {
+        if (entity == null) {
+            return -1;
+        }
+        return mapper.delete(entity);
+    }
 
-	@Override
-	public int deleteByGids(List<Long> gids) throws Exception {
-		if (gids.isEmpty()) {
-			return 0;
-		}
-		if (gids.size() > 1000) {
-			throw new Exception("gid more than 1000");
-		}
-		return mapper.deleteByGids(gids);
-	}
+    @Override
+    public int deleteById(String id) {
+        if (id == null || id.isEmpty()) {
+            return -1;
+        }
+        Set<String> ids = new HashSet<>();
+        ids.add(id);
+        return deleteByIds(ids);
+    }
 
-	@Override
-	public int update(${className} entity) throws Exception {
-		return mapper.update(entity);
-	}
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteByIds(Collection<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return -1;
+        }
+        List<String> idList = new ArrayList<>(ids);
+        int size = idList.size();
+        for (int i = 0; i < size; i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, size);
+            mapper.deleteByIds(idList.subList(i, end));
+        }
+        return size;
+    }
 
-	@Override
-	public int updateMany(List<${className}> list) throws Exception {
-		if (list == null || list.isEmpty()) {
-			return 0;
-		}
-		return mapper.updateMany(list);
-	}
+    @Override
+    public int update(${className} entity) {
+        if (entity == null) {
+            return -1;
+        }
+        return mapper.update(entity);
+    }
 
-	@Override
-	public List<${className}> queryAll() throws Exception {
-		return mapper.queryAll();
-	}
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updateBatch(List<${className}> list) {
+        if (list == null || list.isEmpty()) {
+            return -1;
+        }
+        int size = list.size();
+        for (int i = 0; i < size; i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, size);
+            mapper.updateBatch(list.subList(i, end));
+        }
+        return size;
+    }
 
-	@Override
-	public List<${className}> queryByEntity(${className} entity) throws Exception {
-		List<${className}> list = mapper.queryByEntity(entity);
-		return list;
-	}
+    @Override
+    public List<${className}> list(${className} entity) {
+        if (entity == null) {
+            return new ArrayList<>();
+        }
+        return mapper.list(entity);
+    }
 
-	@Override
-	public ${className} queryByGid(Long gid) throws Exception {
-		${className} entity = mapper.queryByGid(gid);
-		return entity;
-	}
+    @Override
+    public ${className} getById(String id) {
+        if (id == null || id.isEmpty()) {
+            return new ${className}();
+        }
+        Set<String> ids = new HashSet<>();
+        ids.add(id);
+        List<${className}> list = listByIds(ids);
+        if (list == null || list.isEmpty()) {
+            return new ${className}();
+        }
+        return list.get(0);
+    }
 
-	@Override
-	public List<${className}> queryByGids(List<Long> gids) throws Exception {
-		if (gids.size() > 1000) {
-			throw new Exception("gid more than 1000");
-		}
-		List<${className}> list = mapper.queryByGids(gids);
-		return list;
-	}
+    @Override
+    public List<${className}> listByIds(Collection<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<String> idList = new ArrayList<>(ids);
+        int size = idList.size();
 
-	@Override
-	public PageInfo<${className}> queryByPage(Integer page, Integer pageSize, ${className} entity) throws Exception {
-		if (page == null || page < 1) {
-			page = 1;
-		}
-		if (pageSize == null || pageSize < 1) {
-			pageSize = 20;
-		}
-		PageHelper.startPage(page, pageSize);
-		PageHelper.orderBy(entity.getOrderBy() + " " + entity.getOrder());
+        List<${className}> list = new ArrayList<>();
+        for (int i = 0; i < size; i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, size);
+            list.addAll(mapper.listByIds(idList.subList(i, end)));
+        }
+        return list;
+    }
 
-		List<${className}> list = mapper.queryByEntity(entity);
-		return new PageInfo<>(list);
-	}
-
+    @Override
+    public JSONArray getInfoGroupBy(${className} entity, Collection<String> groupBy) {
+        return mapper.getInfoGroupBy(entity, groupBy);
+    }
 }

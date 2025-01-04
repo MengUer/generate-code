@@ -2,32 +2,137 @@ package priv.menguer.velocity.base;
 
 //import com.github.pagehelper.PageInfo;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 
 public interface BasicService<T> {
-	int insert(T entity) throws Exception;
+    int BATCH_SIZE = 1000;
 
-	int insertMany(List<T> list) throws Exception;
+    int upsert(T entity);
 
-	int deleteById(Long id) throws Exception;
+    /**
+     * 单条新增
+     *
+     * @param entity
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:40
+     */
+    int insert(T entity);
 
-	int deleteByIds(Long[] ids) throws Exception;
+    /**
+     * 批量新增
+     *
+     * @param list
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:40
+     */
+    int insertBatch(List<T> list);
 
-	int delete(T entity) throws Exception;
+    /**
+     * 按条件删除
+     *
+     * @param entity
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:40
+     */
+    int delete(T entity);
 
-	int update(T entity) throws Exception;
+    /**
+     * 按单个id删除
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    int deleteById(String id);
 
-	int updateMany(List<T> list) throws Exception;
+    /**
+     * 按多个id删除
+     *
+     * @param ids
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    int deleteByIds(Collection<String> ids);
 
-	int merge(T entity) throws Exception;
+    /**
+     * 单条更新
+     *
+     * @param entity
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    int update(T entity);
 
-	List<T> list(T entity) throws Exception;
+    /**
+     * 批量更新
+     *
+     * @param list
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    int updateBatch(List<T> list);
 
-	T getInfo(Long id) throws Exception;
+    /**
+     * 条件查询
+     *
+     * @param entity
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    List<T> list(T entity);
 
-	JSONArray getInfoGroupBy(T entity, String groupBy) throws Exception;
+    /**
+     * 按单个id查询
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    T getById(String id);
 
-	// PageInfo<T> queryByPage(Integer page, Integer pageSize, T entity) throws Exception;
+    /**
+     * 按多个id查询
+     *
+     * @param ids
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:41
+     */
+    List<T> listByIds(Collection<String> ids);
+
+    /**
+     * 分组查询
+     *
+     * @param entity
+     * @param groupBy
+     * @return
+     * @throws Exception
+     * @author menguer@126.com
+     * @time 2025/1/4 21:42
+     */
+    JSONArray getInfoGroupBy(T entity, Collection<String> groupBy);
+
+    // PageInfo<T> queryByPage(Integer page, Integer pageSize, T entity);
 }

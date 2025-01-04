@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.${projectName}.dao.${className}Mapper">
-	<!-- 开启二级缓存 -->
-	<cache />
-	<resultMap id="BaseResultMap" type="com.${projectName}.model.${className}">
+<mapper namespace="${projectName}.dao.${className}Mapper">
+	<resultMap id="baseResultMap" type="${projectName}.entity.${className}">
 	#foreach($e in $list)
 		<result property="${e.columnJavaName}" column="${e.columnName}"/>
 	#end	
@@ -21,31 +19,9 @@
 		</trim>
 	</sql>
 	
-	<sql id="QueryColumnList">
-		<trim suffixOverrides=",">
-		#foreach($e in $list)
-			t.${e.columnName},
-		#end	
-		</trim>
-	</sql>
-	
-	<insert id="insert" parameterType="com.${projectName}.model.${className}">
-		INSERT INTO
-		<include refid="tableName" />
-		(
-		<include refid="baseColumns" />
-		)VALUES(
-		<trim suffixOverrides=",">
-		#foreach($e in $list)
-			#{${e.columnJavaName}},
-		#end	
-		</trim>
-		)
-	</insert>
-	
 	<!-- 有则更新，无则新增 -->
-    <insert id="upsert" parameterType="${projectName}.domain.${className}">
-        MERGE into <include refid="tableName" /> t
+    <insert id="upsert" parameterType="${projectName}.entity.${className}">
+        MERGE into <include refid="tableName" />
         USING (
             SELECT
             <trim suffixOverrides=",">
@@ -92,28 +68,27 @@
             )
     </insert>
 	
-	<insert id="insertMany" parameterType="java.util.List">
-		INSERT ALL
-		<foreach item="item" index="index" collection="list">
-			INTO
-			<include refid="tableName" />
-			(
-			<include refid="baseColumns" />
-			)VALUES(
-			<trim suffixOverrides=",">
+	<insert id="insertBatch" parameterType="java.util.List">
+		INSERT INTO <include refid="tableName" />
+		(<include refid="baseColumns" />)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(<trim suffixOverrides=",">
 			#foreach($e in $list)
+			#if(${e.columnName}=='create_time')
+				now(),
+			#elseif(${e.columnName}=='del_flag')
+			    '0',
+			#else
 				#{item.${e.columnJavaName}},
-			#end	
-			</trim>
-			)
+			#end
+			#end
+			</trim>)
 		</foreach>
-		SELECT 1 FROM DUAL
 	</insert>
 	
-	<delete id="delete" parameterType="com.${projectName}.model.${className}">
-        DELETE FROM
-        <include refid="tableName" />
-                WHERE 1=1
+	<delete id="delete" parameterType="${projectName}.entity.${className}">
+        DELETE FROM <include refid="tableName" /> WHERE 1=1
 #foreach( $e in $list)
     #if(${e.myBatisType}=='VARCHAR' && ${e.columnIsLikeQuery}=='YES')
         <if test="${e.columnJavaName} != null">
@@ -127,31 +102,25 @@
 #end
     </delete>
 
-	<delete id="deleteById" parameterType="java.lang.Long">
-		DELETE FROM
-		<include refid="tableName" />
-		WHERE id = #{id}
-	</delete>
-
-	<delete id="deleteByIds" parameterType="java.util.List">
-		DELETE FROM
-		<include refid="tableName" />
+	<delete id="deleteByIds" parameterType="java.util.Collection">
+		DELETE FROM <include refid="tableName" />
 		WHERE id IN
-		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+		<foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
 			#{item}
 		</foreach>
 	</delete>
 
-	<update id="update" parameterType="com.${projectName}.model.${className}">
-		UPDATE
-		<include refid="tableName" />
+	<update id="update" parameterType="${projectName}.entity.${className}">
+		UPDATE <include refid="tableName" />
 		<set>
 		#foreach( $e in $list)
+		#if(${e.columnName}!='id' && ${e.columnName}!='update_time')
 			<if test="${e.columnJavaName} != null">
 				${e.columnName} = #{${e.columnJavaName}},
 			</if>
 		#end
-			updatetime = now()
+		#end
+			update_time = now()
 		</set>
 		WHERE id = #{id}
 	</update>
@@ -159,27 +128,24 @@
 	<update id="updateMany" parameterType="java.util.List">
 		BEGIN
 		<foreach item="item" index="index" collection="list">
-			UPDATE
-			<include refid="tableName" />
+			UPDATE <include refid="tableName" />
 			<set>
 			#foreach( $e in $list)
+			#if(${e.columnName}!='id' && ${e.columnName}!='update_time')
 				<if test="item.${e.columnJavaName} != null">
 					${e.columnName} = #{item.${e.columnJavaName}},
 				</if>
 			#end
-				updatetime = now()
+			#end
+				update_time = now()
 			</set>
 			WHERE id = #{item.id};
 		</foreach>
 		END;
 	</update>
 	
-	<select id="query" parameterType="com.${projectName}.model.${className}" resultMap="BaseResultMap">
-		SELECT
-		<include refid="QueryColumnList" />
-		FROM
-		<include refid="tableName" />
-		WHERE 1=1
+	<select id="list" parameterType="${projectName}.entity.${className}" resultMap="baseResultMap">
+		SELECT <include refid="baseColumns" /> FROM <include refid="tableName" /> WHERE 1=1
 #foreach( $e in $list)
 	#if(${e.myBatisType}=='VARCHAR' && ${e.columnIsLikeQuery}=='YES')
 		<if test="${e.columnJavaName} != null">
@@ -191,29 +157,12 @@
 		</if>
 	#end
 #end
-		<if test="startTime != null and startTime != ''">
-			AND updatetime >= TO_DATE(#{startTime},'SYYYY-MM-DD HH24:MI:SS')
-		</if>
-		<if test="endTime != null and endTime != ''">
-			AND updatetime &lt;= TO_DATE(#{endTime},'SYYYY-MM-DD HH24:MI:SS')
-		</if>
 	</select>
 
-	<select id="queryById" parameterType="java.lang.Long" resultMap="BaseResultMap">
-		SELECT
-		<include refid="QueryColumnList" />
-		FROM
-		<include refid="tableName" /> t
-		WHERE t.id = #{id}
-	</select>
-
-	<select id="queryByIds" parameterType="java.util.List" resultMap="BaseResultMap">
-		SELECT
-		<include refid="QueryColumnList" />
-		FROM
-		<include refid="tableName" /> t
-		WHERE t.id IN
-		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+	<select id="listByIds" parameterType="java.util.Collection" resultMap="baseResultMap">
+		SELECT <include refid="baseColumns" /> FROM <include refid="tableName" /> 
+		WHERE id IN
+		<foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
 			#{item}
 		</foreach>
 	</select>

@@ -1,7 +1,7 @@
-package com.${projectName}.service;
+package ${projectName}.service;
 
-import com.hopetop.port.common.base.BasicService;
-import com.${projectName}.model.${className};
+import ${projectName}.base.BasicService;
+import ${projectName}.entity.${className};
 
 /**
  * @author menguer@126.com

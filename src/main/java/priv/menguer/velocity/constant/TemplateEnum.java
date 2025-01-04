@@ -107,7 +107,7 @@ public enum TemplateEnum {
             return generatePath.append("\\").append(className).append("Mapper.java").toString();
         }
         if (MAPPER.value.equals(value)) {
-            generatePath.append("\\dao");
+            generatePath.append("\\dao\\xml");
             FileUtils.createFolder(generatePath.toString());
             return generatePath.append("\\").append(className).append("Mapper.xml").toString();
         }
