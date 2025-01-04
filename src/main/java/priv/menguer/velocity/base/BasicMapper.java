@@ -11,14 +11,14 @@ import com.alibaba.fastjson.JSONArray;
  */
 public interface BasicMapper<T> {
     /**
-     * 有则更新，无则新增
+     * 批量有则更新，无则新增
      *
-     * @param entity
+     * @param list
      * @return
-     * @author ZhangMingHan
-     * @time 2024年1月21日 17:37:21
+     * @author menguer@126.com
+     * @time 2025/1/4 23:56
      */
-    int upsert(T entity);
+    int upsertBatch(List<T> list);
 
     /**
      * 多条新增
@@ -49,16 +49,6 @@ public interface BasicMapper<T> {
      * @time 2023年12月26日 14:35:53
      */
     int deleteByIds(@Param("ids") Collection<String> ids);
-
-    /**
-     * 单条修改
-     *
-     * @param entity
-     * @return
-     * @author ZhangMingHan
-     * @time 2023年12月26日 14:35:58
-     */
-    int update(T entity);
 
     /**
      * 多条修改

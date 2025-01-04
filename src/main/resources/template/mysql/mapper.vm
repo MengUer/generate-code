@@ -20,52 +20,30 @@
 	</sql>
 	
 	<!-- 有则更新，无则新增 -->
-    <insert id="upsert" parameterType="${projectName}.entity.${className}">
-        MERGE into <include refid="tableName" />
-        USING (
-            SELECT
-            <trim suffixOverrides=",">
+    <insert id="upsertBatch" parameterType="java.util.List">
+        INSERT INTO <include refid="tableName" />
+        (<include refid="baseColumns" />)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (<trim suffixOverrides=",">
             #foreach($e in $list)
-            <choose><when test="${e.columnJavaName} != null">#{${e.columnJavaName}}</when><otherwise>''</otherwise></choose> AS ${e.columnName},
+            #if(${e.columnName}=='create_time')
+                now(),
+            #elseif(${e.columnName}=='del_flag')
+                '0',
+            #else
+                #{item.${e.columnJavaName}},
             #end
-            </trim>
-            FROM dual
-        ) tt
-        ON (
-            1=1
-            and t.seq_id=tt.seq_id
-        )
-        WHEN MATCHED THEN
-            <!-- 执行update -->
-            UPDATE
-            <set>
-            #foreach( $e in $list)
-                #if(${e.columnJavaName}!='seqId' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
-                t.${e.columnName} = tt.${e.columnName},
-                #end
             #end
-                t.update_time = sysdate
-            </set>
-        WHEN NOT MATCHED THEN
-            <!-- 执行insert -->
-            INSERT 
-            (
-            <trim suffixOverrides=",">
-            #foreach($e in $list)
-                #if(${e.columnJavaName}!='seqId' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
-                t.${e.columnName},
-                #end
-            #end    
-            </trim>
-            )VALUES(
-            <trim suffixOverrides=",">
-            #foreach($e in $list)
-                #if(${e.columnJavaName}!='seqId' && ${e.columnJavaName}!='createTime' && ${e.columnJavaName}!='updateTime')
-                tt.${e.columnName},
-                #end
-            #end    
-            </trim>
-            )
+            </trim>)
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        #foreach($e in $list)
+        #if(${e.columnName}!='id' && ${e.columnName}!='update_time')
+            ${e.columnName} = VALUES(${e.columnName}),
+        #end
+        #end
+            update_time = now()
     </insert>
 	
 	<insert id="insertBatch" parameterType="java.util.List">
@@ -110,24 +88,8 @@
 		</foreach>
 	</delete>
 
-	<update id="update" parameterType="${projectName}.entity.${className}">
-		UPDATE <include refid="tableName" />
-		<set>
-		#foreach( $e in $list)
-		#if(${e.columnName}!='id' && ${e.columnName}!='update_time')
-			<if test="${e.columnJavaName} != null">
-				${e.columnName} = #{${e.columnJavaName}},
-			</if>
-		#end
-		#end
-			update_time = now()
-		</set>
-		WHERE id = #{id}
-	</update>
-
-	<update id="updateMany" parameterType="java.util.List">
-		BEGIN
-		<foreach item="item" index="index" collection="list">
+	<update id="updateBatch" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" separator=";">
 			UPDATE <include refid="tableName" />
 			<set>
 			#foreach( $e in $list)
@@ -139,9 +101,8 @@
 			#end
 				update_time = now()
 			</set>
-			WHERE id = #{item.id};
+			WHERE id = #{item.id}
 		</foreach>
-		END;
 	</update>
 	
 	<select id="list" parameterType="${projectName}.entity.${className}" resultMap="baseResultMap">
@@ -166,5 +127,4 @@
 			#{item}
 		</foreach>
 	</select>
-	
 </mapper>

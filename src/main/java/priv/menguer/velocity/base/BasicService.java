@@ -10,7 +10,25 @@ import com.alibaba.fastjson.JSONArray;
 public interface BasicService<T> {
     int BATCH_SIZE = 1000;
 
+    /**
+     * 单条有则更新无则新增
+     *
+     * @param entity
+     * @return
+     * @author menguer@126.com
+     * @time 2025/1/4 23:56
+     */
     int upsert(T entity);
+
+    /**
+     * 批量有则更新无则新增
+     *
+     * @param list
+     * @return
+     * @author menguer@126.com
+     * @time 2025/1/4 23:57
+     */
+    int upsertBatch(List<T> list);
 
     /**
      * 单条新增
