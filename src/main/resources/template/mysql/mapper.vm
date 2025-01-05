@@ -47,7 +47,7 @@
     </insert>
 	
 	<insert id="insertBatch" parameterType="java.util.List">
-		INSERT INTO <include refid="tableName" />
+		INSERT IGNORE INTO <include refid="tableName" />
 		(<include refid="baseColumns" />)
 		VALUES
 		<foreach collection="list" item="item" index="index" separator=",">
