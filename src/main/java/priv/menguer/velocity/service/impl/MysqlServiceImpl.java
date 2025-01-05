@@ -77,7 +77,7 @@ public class MysqlServiceImpl implements MysqlService {
         if (columnType.contains("int")) {
             return "Integer";
         }
-        if ("double".equals(columnType) || "number".equals(columnType) || "numeric".equals(columnType)) {
+        if ("double".equals(columnType) || "number".equals(columnType) || "numeric".equals(columnType) || "decimal".equals(columnType)) {
             return "BigDecimal";
         }
         if (columnType.contains("date") || columnType.contains("time")) {
