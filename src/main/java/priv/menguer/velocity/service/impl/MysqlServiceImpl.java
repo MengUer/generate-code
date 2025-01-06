@@ -74,6 +74,9 @@ public class MysqlServiceImpl implements MysqlService {
     }
 
     private String getJavaType(String columnType) {
+        if (columnType.contains("bigint")) {
+            return "Long";
+        }
         if (columnType.contains("int")) {
             return "Integer";
         }
