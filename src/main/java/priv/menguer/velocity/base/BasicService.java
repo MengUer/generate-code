@@ -6,8 +6,11 @@ import java.util.Collection;
 import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public interface BasicService<T> {
+    Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
     int BATCH_SIZE = 1000;
 
     /**
