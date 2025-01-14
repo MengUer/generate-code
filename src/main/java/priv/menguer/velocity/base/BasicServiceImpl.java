@@ -1,11 +1,13 @@
 package priv.menguer.velocity.base;
 
 import com.alibaba.fastjson.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 public class BasicServiceImpl<M extends BasicMapper<T>, T> implements BasicService<T> {
+    @Autowired
     protected M baseMapper;
 
     @Override
